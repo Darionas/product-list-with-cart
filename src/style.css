@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+.attribution {
+    @apply absolute bottom-0 text-xs mt-4 p-2 w-full text-center self-center text-indigo-950 bg-red-200;
+}
+
+.attribution a {
+    @apply text-indigo-700;
+}
