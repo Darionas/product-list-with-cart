@@ -15,4 +15,5 @@
 .DS_Store
 .prettierignore
 
+# Do not upload the node_modules folder
 node_modules/
