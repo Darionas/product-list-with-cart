@@ -1,9 +1,72 @@
 @import "tailwindcss";
 
+
+@font-face {
+	font-family: 'Red Hat Text';
+	src: local('Red Hat Text'),
+		url('./assets/fonts/RedHatText-VariableFont_wght.ttf') format('truetype');
+	font-style: normal;
+	font-weight: 300 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Red Hat Text';
+	src: local('Red Hat Text Italic'),
+		url('./assets/fonts/RedHatText-Italic-VariableFont_wght.ttf') format('truetype');
+	font-style: italic;
+	font-weight: 300 700;
+	font-display: swap;
+}
+
+/* Fallback faces for browsers without variable font support. */
+@supports not (font-variation-settings: normal) {
+	@font-face {
+		font-family: 'Red Hat Text';
+		src: local('Red Hat Text Regular'), local('RedHatText-Regular'),
+			url('./assets/fonts/static/RedHatText-Regular.ttf') format('truetype');
+		font-weight: 400;
+		font-style: normal;
+		font-display: swap;
+	}
+
+	@font-face {
+		font-family: 'Red Hat Text';
+		src: local('Red Hat Text Semi Bold'), local('RedHatText-SemiBold'),
+			url('./assets/fonts/static/RedHatText-SemiBold.ttf') format('truetype');
+		font-weight: 600;
+		font-style: normal;
+		font-display: swap;
+	}
+
+	@font-face {
+		font-family: 'Red Hat Text';
+		src: local('Red Hat Text Bold'), local('RedHatText-Bold'),
+			url('./assets/fonts/static/RedHatText-Bold.ttf') format('truetype');
+		font-weight: 700;
+		font-style: normal;
+		font-display: swap;
+	}
+}
+
+body {
+	font-family: 'Red Hat Text',  system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+
 .attribution {
     @apply absolute bottom-0 text-xs mt-4 p-2 w-full text-center self-center text-indigo-950 bg-red-200;
 }
 
 .attribution a {
     @apply text-indigo-700;
+}
+
+
+@theme {
+	--color-brand-red: hsl(14, 86%, 42%);
+}
+
+@theme {
+	--color-brand-green: hsl(159, 69%, 38%);
 }

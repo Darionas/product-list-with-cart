@@ -33,9 +33,10 @@ Your users should be able to:
 ## Plan workflow
 
 - [x] Create of repo (1st task)
-- [ ] Create HTML layout (2nd task)
-- [ ] Create CSS layout for mobile first (3rd task)
-- [ ] Create CSS layout for tablet (4th task)
-- [ ] Craete CSS layout for desktop (5th task)
-- [ ] Implement JavaScript (6th task)
+- [ ] Create design system (2nd task)
+- [ ] Create HTML layout (3rd task)
+- [ ] Create CSS layout for mobile first (4th task)
+- [ ] Create CSS layout for tablet (5th task)
+- [ ] Craete CSS layout for desktop (6th task)
+- [ ] Implement JavaScript (7th task)
 - [ ] Tada it is done. Congratulation you reach your goal 🎉🎉🎉
