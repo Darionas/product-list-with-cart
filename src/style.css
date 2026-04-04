@@ -65,8 +65,13 @@ body {
 
 @theme {
 	--color-brand-red: hsl(14, 86%, 42%);
+	--color-rose-50: #FCF8F6;
+    --color-rose-100: #F5EEEC;
+    --color-rose-300: #CAAFA7;
+    --color-rose-400: #AD8A85;
+    --color-rose-500: #87635A;
+    --color-rose-900: #260F08;
+    --color-brand-red: #C73B0F;
+    --color-brand-green: #1EA575;
 }
 
-@theme {
-	--color-brand-green: hsl(159, 69%, 38%);
-}
