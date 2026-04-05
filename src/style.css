@@ -55,7 +55,7 @@ body {
 
 
 .attribution {
-    @apply absolute bottom-0 text-xs mt-4 p-2 w-full text-center self-center text-indigo-950 bg-red-200;
+    @apply relative bottom-0 left-0 right-0 text-xs mt-10 p-2 w-auto text-center self-center text-indigo-950 bg-gray-100;
 }
 
 .attribution a {
@@ -64,7 +64,7 @@ body {
 
 
 @theme {
-	--color-brand-red: hsl(14, 86%, 42%);
+	--color-brand-red: #C73B0F;
 	--color-rose-50: #FCF8F6;
     --color-rose-100: #F5EEEC;
     --color-rose-300: #CAAFA7;
