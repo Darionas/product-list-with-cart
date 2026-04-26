@@ -38,5 +38,5 @@ Your users should be able to:
 - [x] Create CSS layout for mobile first (4th task)
 - [x] Create CSS layout for tablet (5th task)
 - [x] Craete CSS layout for desktop (6th task)
-- [ ] Implement JavaScript (7th task)
-- [ ] Tada it is done. Congratulation you reach your goal 🎉🎉🎉
+- [x] Implement JavaScript (7th task)
+- [x] Tada it is done. Congratulation you reach your goal 🎉🎉🎉
