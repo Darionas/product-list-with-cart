@@ -59,12 +59,49 @@ body {
 }
 
 .attribution a {
-    @apply text-indigo-700;
+    @apply text-indigo-700 underline decoration-2 font-semibold;
+}
+
+.attribution a:focus {
+	@apply [outline:3px_solid_Highlight] outline-offset-2 no-underline;
+}
+
+.external-icon {
+	@apply text-[0.9em];
+}
+
+@layer components {
+	.btn-cart-primary {
+		@apply flex justify-center items-center w-full h-13.25 border-2 border-brand-red rounded-full bg-brand-red py-6 px-4 mt-6 text-white text-base font-semibold cursor-pointer;
+	}
+
+	.btn-cart-primary:hover {
+		background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25));
+	}
+
+	.cart-remove-btn {
+		@apply flex justify-center items-center w-5 h-5 border-2 border-rose-300 rounded-full cursor-pointer;
+	}
+
+	.cart-item-row {
+		@apply flex items-center justify-between border-b border-rose-100 pb-4 mb-4;
+	}
+
+	.cart-price-muted {
+		@apply text-rose-500 text-base font-normal;
+	}
+
+	.cart-price-total {
+		@apply text-base font-semibold text-rose-500;
+	}
+
+	.cart-ordered-qty {
+		@apply text-brand-red text-base font-semibold;
+	}
 }
 
 
 @theme {
-	--color-brand-red: #C73B0F;
 	--color-rose-50: #FCF8F6;
     --color-rose-100: #F5EEEC;
     --color-rose-300: #CAAFA7;
@@ -73,5 +110,33 @@ body {
     --color-rose-900: #260F08;
     --color-brand-red: #C73B0F;
     --color-brand-green: #1EA575;
+}
+
+:root {
+	--color-rose-50: #FCF8F6;
+	--color-rose-100: #F5EEEC;
+	--color-rose-300: #CAAFA7;
+	--color-rose-400: #AD8A85;
+	--color-rose-500: #87635A;
+	--color-rose-900: #260F08;
+	--color-brand-red: #C73B0F;
+	--color-brand-green: #1EA575;
+}
+
+/* Keep keyboard focus visibility explicit and consistent across interactive controls. */
+:where(
+	a[href],
+	button,
+	input,
+	select,
+	textarea,
+	summary,
+	[role="button"],
+	[tabindex]:not([tabindex="-1"])
+):focus-visible {
+	outline: 3px solid var(--color-brand-red);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 2px var(--color-rose-50);
+	border-radius: 999rem;
 }
 

@@ -26,7 +26,7 @@ const baseMarkup = `
 `;
 
 async function bootApp() {
-    const scriptPath = path.resolve(process.cwd(), 'script.js');
+    const scriptPath = path.resolve(process.cwd(), 'src', 'app.js');
     const scriptUrl = `${pathToFileURL(scriptPath).href}?t=${Date.now()}-${Math.random()}`;
 
     await import(scriptUrl);

@@ -2,9 +2,10 @@
   "name": "product-list-with-cart-main",
   "version": "1.0.0",
   "description": "![Static Badge](https://img.shields.io/badge/https%3A%2F%2Fimg.shields.io%2Fbadge%2FDifficulty-junior-%2391bd28?style=for-the-badge&logo=Frontend%20mentor&logoColor=white&label=Difficulty&labelColor=%23555555&color=%2391bd28)",
-  "main": "index.js",
+  "main": "index.html",
   "scripts": {
-    "build-css": "tailwindcss -i ./src/style.css -o ./style.css --watch",
+    "dev:css": "tailwindcss -i ./src/index.css -o ./style.css --watch",
+    "build:css": "tailwindcss -i ./src/index.css -o ./style.css --minify",
     "test": "vitest run",
     "test:watch": "vitest"
   },

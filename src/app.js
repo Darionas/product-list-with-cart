@@ -1,0 +1,474 @@
+'use strict';
+/* jshint esversion: 6 */
+
+const productsSection = document.getElementById('products_section');
+
+function renderDataLoadError() {
+    productsSection.innerHTML = '';
+
+    const messageCard = document.createElement('div');
+    messageCard.className = 'md:col-span-3 rounded-lg border border-rose-300 bg-white p-6 text-rose-900';
+    messageCard.setAttribute('role', 'alert');
+    messageCard.setAttribute('aria-live', 'assertive');
+
+    const title = document.createElement('h2');
+    title.className = 'text-lg font-semibold';
+    title.textContent = 'Unable to load products';
+
+    const message = document.createElement('p');
+    message.className = 'mt-2 text-sm text-rose-500';
+    message.textContent = 'Please check your connection and try again.';
+
+    const retryButton = document.createElement('button');
+    retryButton.className = 'mt-4 inline-flex h-11 items-center justify-center rounded-full border-2 border-brand-red bg-brand-red px-5 text-sm font-semibold text-white cursor-pointer';
+    retryButton.textContent = 'Retry';
+    retryButton.addEventListener('click', () => {
+        window.location.reload();
+    });
+
+    messageCard.appendChild(title);
+    messageCard.appendChild(message);
+    messageCard.appendChild(retryButton);
+    productsSection.appendChild(messageCard);
+}
+
+// fetch data from JSON
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('./data.json')
+        .then((response) =>{
+            if(!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then((data) => {
+           /*  localStorage.setItem('data', JSON.stringify(data)); */
+            populateData(data);
+        })
+        .catch((error) => {
+            console.error('There was a problem with the fetch operation', error);
+            renderDataLoadError();
+       });
+});
+
+function populateData(data) {
+    const allCards = data.map((product, index) => `
+        <div class="grid gap-4 w-full h-88" data-index="${index}">
+            <div class="relative flex flex-col items-center">
+                <picture class="block w-full"> 
+                    <source media="(max-width: 767px)" srcset="${product.image.mobile}"> 
+                    <source media="(max-width: 1023px)" srcset="${product.image.tablet}"> 
+                    <img class="w-full h-55 object-cover rounded-md bg-cover" src="${product.image.desktop}" alt="${product.name}"> 
+                </picture>
+                <button class="add-to-cart-btn group absolute bottom-0 flex gap-2 border-2 border-rose-400 hover:border-brand-red w-40 h-11 rounded-full p-3 bg-white justify-center items-center cursor-pointer" aria-label="Add ${product.name} to cart">
+                    <img src="./assets/images/icon-add-to-cart.svg" alt="" aria-hidden="true">
+                    <span class="text-rose-900 transition-colors group-hover:text-brand-red text-sm font-semibold">Add to Cart</span>
+                </button>
+                <div class="dish hidden absolute bottom-0 gap-2 border-2 border-brand-red w-40 h-11 rounded-full p-3 bg-brand-red justify-between items-center">
+                        <button class="dec group flex justify-center items-center border-2 border-white hover:border-brand-red bg-brand-red hover:bg-white rounded-full w-5 h-5 cursor-pointer" aria-label="Decrease ${product.name} quantity">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="2" fill="none" viewBox="0 0 10 2">
+                               <path class="fill-white transition-colors group-hover:fill-brand-red" d="M0 .375h10v1.25H0V.375Z"/>
+                            </svg>
+                        </button>
+                        <p class="quantity text-white text-sm font-semibold">0</p>
+                        <button class="inc group flex justify-center items-center border-2 border-white hover:border-brand-red bg-brand-red hover:bg-white rounded-full w-5 h-5 cursor-pointer" aria-label="Increase ${product.name} quantity">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 10 10">
+                                <path class="fill-white transition-colors group-hover:fill-brand-red" d="M10 4.375H5.625V0h-1.25v4.375H0v1.25h4.375V10h1.25V5.625H10v-1.25Z"/>
+                            </svg>
+                        </button>   
+                </div>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <p class="text-rose-500 text-sm font-normal">${product.category}</p>
+                <p class="text-rose-900 text-base font-semibold truncate max-w-40">${product.name}</p>
+                <p class="text-brand-red text-base font-semibold"><span>$</span><span>${product.price.toFixed(2)}</span></p>
+            </div>
+        </div>
+    `).join('');                
+    
+    productsSection.innerHTML = allCards;
+    const cartSection = document.querySelector('#cart_section');
+    const detailsSection = document.querySelector('.details');
+    const totalDishesElement = document.querySelector('.totalDishes');
+
+    function getOrCreateCartItemsContainer() {
+        return cartSection.querySelector('.cart-items') || (() => {
+            const container = document.createElement('div');
+            container.className = 'cart-items overflow-y-auto';
+            container.style.maxHeight = window.innerWidth >= 768 ? '40dvh' : '65dvh';
+            cartSection.appendChild(container);
+            return container;
+        })();
+    }
+
+    function updateCartTotals() {
+        const orderedDish = cartSection.querySelectorAll('.orderedDishes');
+        const totalDishCount = [...orderedDish].reduce((acc, dish) => acc + parseInt(dish.innerText), 0);
+        totalDishesElement.textContent = totalDishCount;
+
+        const totalPrice = cartSection.querySelectorAll('.totalPrice');
+        const total = [...totalPrice].reduce((acc, dish) => acc + parseFloat(dish.innerText), 0);
+        const totalRow = cartSection.querySelector('.order-total-row');
+        if (!totalRow) return;
+
+        const totalSum = totalRow.querySelector('.totalSum');
+        totalSum.textContent = total.toFixed(2);
+    }
+
+    function createRemoveDishButton(productName) {
+        const button = document.createElement('button');
+        button.className = 'removeDish cart-remove-btn';
+        button.setAttribute('aria-label', `Remove ${productName} from cart`);
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        svg.setAttribute('width', '10');
+        svg.setAttribute('height', '10');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('viewBox', '0 0 10 10');
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('fill', '#CAAFA7');
+        path.setAttribute('d', 'M8.375 9.375 5 6 1.625 9.375l-1-1L4 5 .625 1.625l1-1L5 4 8.375.625l1 1L6 5l3.375 3.375-1 1Z');
+
+        svg.appendChild(path);
+        button.appendChild(svg);
+        return button;
+    }
+
+    function createCartItemElement(index, product, quantity) {
+        const row = document.createElement('div');
+        row.dataset.cartIndex = index;
+        row.className = 'cart-item-row';
+
+        const content = document.createElement('div');
+        content.className = 'min-w-0';
+
+        const name = document.createElement('p');
+        name.className = 'text-rose-900 text-base font-semibold pb-2 truncate max-w-40';
+        name.textContent = product.name;
+
+        const pricingLine = document.createElement('p');
+
+        const orderedDishes = document.createElement('span');
+        orderedDishes.className = 'orderedDishes cart-ordered-qty';
+        orderedDishes.textContent = quantity;
+
+        const xMultiplier = document.createElement('span');
+        xMultiplier.className = 'text-brand-red text-base font-semibold';
+        xMultiplier.textContent = 'x';
+
+        const unitPrefix = document.createElement('span');
+        unitPrefix.className = 'cart-price-muted';
+        unitPrefix.textContent = '@ $';
+
+        const unitPrice = document.createElement('span');
+        unitPrice.className = 'cart-price-muted';
+        unitPrice.textContent = product.price.toFixed(2);
+
+        const totalPrefix = document.createElement('span');
+        totalPrefix.className = 'cart-price-total';
+        totalPrefix.textContent = ' $';
+
+        const totalPrice = document.createElement('span');
+        totalPrice.className = 'totalPrice cart-price-total';
+        totalPrice.textContent = (quantity * product.price).toFixed(2);
+
+        pricingLine.appendChild(orderedDishes);
+        pricingLine.appendChild(xMultiplier);
+        pricingLine.appendChild(document.createTextNode(' '));
+        pricingLine.appendChild(unitPrefix);
+        pricingLine.appendChild(unitPrice);
+        pricingLine.appendChild(totalPrefix);
+        pricingLine.appendChild(totalPrice);
+
+        content.appendChild(name);
+        content.appendChild(pricingLine);
+        row.appendChild(content);
+        row.appendChild(createRemoveDishButton(product.name));
+
+        return row;
+    }
+
+    function createOrderSummaryItemElement(product, name, qty, lineTotal, isLast) {
+        const row = document.createElement('div');
+        row.className = `flex items-center justify-between py-4 first:pt-0 ${isLast ? 'pb-6' : ''} border-b border-rose-100`;
+
+        const left = document.createElement('div');
+        left.className = 'flex items-center gap-4 min-w-0 flex-1';
+
+        const image = document.createElement('img');
+        image.className = 'w-12 h-12 object-cover rounded-md bg-cover';
+        image.src = product.image.desktop;
+        image.alt = product.name;
+
+        const details = document.createElement('div');
+        details.className = 'flex flex-col gap-2 text-sm min-w-0 flex-1 w-0';
+
+        const title = document.createElement('p');
+        title.className = 'text-rose-900 font-semibold truncate block w-40';
+        title.textContent = name;
+
+        const priceLine = document.createElement('p');
+
+        const qtyElement = document.createElement('span');
+        qtyElement.className = 'text-brand-red font-semibold';
+        qtyElement.textContent = `${qty}x`;
+
+        const eachElement = document.createElement('span');
+        eachElement.className = 'text-rose-500 font-normal';
+        eachElement.textContent = ` @ $${Number(product.price).toFixed(2)}`;
+
+        priceLine.appendChild(qtyElement);
+        priceLine.appendChild(eachElement);
+
+        details.appendChild(title);
+        details.appendChild(priceLine);
+
+        left.appendChild(image);
+        left.appendChild(details);
+
+        const total = document.createElement('p');
+        total.className = 'text-rose-900 font-semibold';
+        total.textContent = `$${lineTotal}`;
+
+        row.appendChild(left);
+        row.appendChild(total);
+
+        return row;
+    }
+
+
+    /* Quantity dishes */
+    const buttons = document.querySelectorAll('.add-to-cart-btn');
+
+    buttons.forEach((button) => {
+        const card = button.closest('.grid');
+        const index = Number(card.dataset.index);
+        const product = data[index];
+        const dish = card.querySelector('.dish');
+        const quantElement = dish.querySelector('.quantity');
+        const incBtn = dish.querySelector('.inc');
+        const decBtn = dish.querySelector('.dec');
+
+        button.addEventListener('click', () => {
+            button.classList.add('hidden');
+            dish.classList.remove('hidden');
+            dish.classList.add('flex');
+        });
+
+        incBtn.addEventListener('click', () => {
+            quantElement.textContent = parseInt(quantElement.innerText) + 1;
+            const productsNumber = +(quantElement.innerText);
+
+            detailsSection.classList.add('hidden');
+            const cartItemsContainer = getOrCreateCartItemsContainer();
+
+            const existingOrder = cartItemsContainer.querySelector(`[data-cart-index="${index}"]`);
+            if (existingOrder) {
+                const quantityElement = existingOrder.querySelector('.orderedDishes');
+                quantityElement.textContent = productsNumber;
+                const totalPriceElement = existingOrder.querySelector('.totalPrice');
+                totalPriceElement.textContent = (productsNumber * product.price).toFixed(2);
+            } else {
+                cartItemsContainer.appendChild(createCartItemElement(index, product, productsNumber));
+            }
+
+            let totalRow = cartSection.querySelector('.order-total-row');
+            let note = cartSection.querySelector('.note');
+            let confBtn = cartSection.querySelector('.confirm-btn');
+            
+            if (!totalRow && !note && !confBtn ) {
+                totalRow = document.createElement('p');
+                totalRow.className = 'order-total-row flex justify-between items-center py-6 text-base font-normal text-rose-900';
+                totalRow.innerHTML = 'Order Total <span class="text-2xl font-bold text-rose-900">$<span class="totalSum">0.00</span></span>';
+                cartSection.appendChild(totalRow);
+                note = document.createElement('p');
+                note.className = 'note mt-auto p-4 bg-rose-50 rounded-md flex items-center gap-2 text-sm text-rose-500';
+                note.innerHTML = '<img src="./assets/images/icon-carbon-neutral.svg" alt="" aria-hidden="true"><span class="font-normal">This is a <span class="font-semibold">carbon-neutral</span> delivery</span>';
+                cartSection.appendChild(note);
+                confBtn = document.createElement('button');
+                confBtn.className = 'confirm-btn btn-cart-primary';
+                confBtn.textContent = 'Confirm Order';
+                cartSection.appendChild(confBtn);
+                exec(confBtn);
+            }
+
+            updateCartTotals();
+        });
+
+            
+
+        decBtn.addEventListener('click', () => {
+            const current = parseInt(quantElement.innerText);
+            if (current > 1) {
+                quantElement.textContent = current - 1;
+
+                const productsNumber = +(quantElement.innerText);
+                const existingOrder = cartSection.querySelector(`[data-cart-index="${index}"]`);
+
+                if (existingOrder) {
+                    const quantityElement = existingOrder.querySelector('.orderedDishes');
+                    quantityElement.textContent = productsNumber;
+                    const totalPriceElement = existingOrder.querySelector('.totalPrice');
+                    totalPriceElement.textContent = (productsNumber * product.price).toFixed(2);
+                }
+
+                updateCartTotals();
+
+            }
+        });
+
+
+        function exec(confBtn) {
+            confBtn.addEventListener('click', () => {
+                const previousFocus = document.activeElement;
+                // Get all cart item elements
+                const cartItems = cartSection.querySelectorAll('[data-cart-index]');
+
+                // Get order total from DOM
+                const orderTotal = cartSection.querySelector('.totalSum').innerText;
+    
+                // Create ONE modal with all items
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex items-center justify-center md:p-10 fixed inset-0 z-50 bg-black/50';
+                const modal = document.createElement('div');
+                modal.className = 'bg-white flex flex-col rounded-lg px-6 pt-10 pb-6 w-full lg:w-148 gap-8 h-fit';
+                modal.setAttribute('role', 'dialog');
+                modal.setAttribute('aria-modal', 'true');
+                modal.setAttribute('aria-labelledby', 'order-confirmed-title');
+
+                const header = document.createElement('div');
+                header.className = 'flex flex-col items-start justify-start';
+
+                const icon = document.createElement('img');
+                icon.className = 'mb-6';
+                icon.src = './assets/images/icon-order-confirmed.svg';
+                icon.alt = 'Order confirmed';
+
+                const title = document.createElement('h2');
+                title.id = 'order-confirmed-title';
+                title.className = 'text-[2.5rem] leading-[1.2] tracking-normal text-rose-900 font-bold';
+                title.textContent = 'Order Confirmed';
+
+                const subtitle = document.createElement('p');
+                subtitle.className = 'text-base text-rose-500 font-normal pt-2';
+                subtitle.textContent = 'We hope you enjoy your food!';
+
+                header.appendChild(icon);
+                header.appendChild(title);
+                header.appendChild(subtitle);
+
+                const summary = document.createElement('div');
+                summary.className = 'bg-rose-50 rounded-lg p-6 overflow-y-auto max-h-[40dvh]';
+
+                cartItems.forEach((item, i) => {
+                    const isLast = i === cartItems.length - 1;
+                    const index = Number(item.getAttribute('data-cart-index'));
+                    const product = data[index];
+                    const name = item.querySelector('.min-w-0 > p').innerText;
+                    const qty = item.querySelector('.orderedDishes').innerText;
+                    const price = item.querySelector('.totalPrice').innerText;
+
+                    summary.appendChild(createOrderSummaryItemElement(product, name, qty, price, isLast));
+                });
+
+                const orderTotalRow = document.createElement('div');
+                orderTotalRow.className = 'flex justify-between items-center text-sm text-rose-900 font-normal pt-6';
+
+                const orderTotalLabel = document.createElement('span');
+                orderTotalLabel.textContent = 'Order Total';
+
+                const orderTotalValue = document.createElement('span');
+                orderTotalValue.className = 'text-2xl font-bold';
+                orderTotalValue.textContent = `$${orderTotal}`;
+
+                orderTotalRow.appendChild(orderTotalLabel);
+                orderTotalRow.appendChild(orderTotalValue);
+                summary.appendChild(orderTotalRow);
+
+                const startNewOrderBtn = document.createElement('button');
+                startNewOrderBtn.className = 'start-new-order-btn btn-cart-primary';
+                startNewOrderBtn.textContent = 'Start New Order';
+
+                modal.appendChild(header);
+                modal.appendChild(summary);
+                modal.appendChild(startNewOrderBtn);
+                wrapper.appendChild(modal);
+                document.body.appendChild(wrapper);
+
+                const focusableElements = modal.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])');
+                const firstFocusable = focusableElements[0];
+                const lastFocusable = focusableElements[focusableElements.length - 1];
+
+                if (firstFocusable) {
+                    firstFocusable.focus();
+                }
+
+                const handleModalKeys = (event) => {
+                    if (event.key === 'Escape') {
+                        event.preventDefault();
+                        startNewOrderBtn.click();
+                    }
+
+                    if (event.key !== 'Tab' || !firstFocusable || !lastFocusable) {
+                        return;
+                    }
+
+                    if (event.shiftKey && document.activeElement === firstFocusable) {
+                        event.preventDefault();
+                        lastFocusable.focus();
+                    } else if (!event.shiftKey && document.activeElement === lastFocusable) {
+                        event.preventDefault();
+                        firstFocusable.focus();
+                    }
+                };
+
+                wrapper.addEventListener('keydown', handleModalKeys);
+
+                startNewOrderBtn.addEventListener('click', () => {
+                    wrapper.removeEventListener('keydown', handleModalKeys);
+                    wrapper.remove();
+
+                    if (previousFocus && typeof previousFocus.focus === 'function') {
+                        previousFocus.focus();
+                    }
+
+                    window.location.reload();
+                })
+
+            });
+        }
+
+    });
+
+    cartSection.addEventListener('click', (event) => {
+        const removeBtn = event.target.closest('.removeDish');
+        if (!removeBtn) return;
+
+        const orderItem = removeBtn.closest('[data-cart-index]');
+        if (!orderItem) return;
+
+        orderItem.remove();
+
+        updateCartTotals();
+
+        const ind = orderItem.getAttribute('data-cart-index');
+        const card = document.querySelector(`.grid[data-index="${ind}"]`);
+        if (!card) return;
+
+        const cardDish = card.querySelector('.dish');
+        const addButton = card.querySelector('.add-to-cart-btn');
+        const quant = card.querySelector('.quantity');
+
+        cardDish.classList.add('hidden');
+        cardDish.classList.remove('flex');
+        addButton.classList.remove('hidden');
+        quant.textContent = 0;
+    });
+
+    
+      
+}
+
+
