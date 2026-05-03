@@ -890,6 +890,25 @@ body {
   .btn-cart-primary:hover {
     background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25));
   }
+  .btn-retry {
+    margin-top: calc(var(--spacing) * 4);
+    display: inline-flex;
+    height: calc(var(--spacing) * 11);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    border-radius: calc(infinity * 1px);
+    border-style: var(--tw-border-style);
+    border-width: 2px;
+    border-color: var(--color-brand-red);
+    background-color: var(--color-brand-red);
+    padding-inline: calc(var(--spacing) * 5);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-white);
+  }
   .cart-remove-btn {
     display: flex;
     height: calc(var(--spacing) * 5);
@@ -933,16 +952,6 @@ body {
     font-weight: var(--font-weight-semibold);
     color: var(--color-brand-red);
   }
-}
-:root {
-  --color-rose-50: #FCF8F6;
-  --color-rose-100: #F5EEEC;
-  --color-rose-300: #CAAFA7;
-  --color-rose-400: #AD8A85;
-  --color-rose-500: #87635A;
-  --color-rose-900: #260F08;
-  --color-brand-red: #C73B0F;
-  --color-brand-green: #1EA575;
 }
 :where(	a[href],	button,	input,	select,	textarea,	summary,	[role="button"],	[tabindex]:not([tabindex="-1"]) ):focus-visible {
   outline: 3px solid var(--color-brand-red);

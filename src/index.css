@@ -79,6 +79,10 @@ body {
 		background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25));
 	}
 
+	.btn-retry {
+		@apply mt-4 inline-flex h-11 items-center justify-center rounded-full border-2 border-brand-red bg-brand-red px-5 text-sm font-semibold text-white cursor-pointer;
+	}
+
 	.cart-remove-btn {
 		@apply flex justify-center items-center w-5 h-5 border-2 border-rose-300 rounded-full cursor-pointer;
 	}
@@ -112,16 +116,6 @@ body {
     --color-brand-green: #1EA575;
 }
 
-:root {
-	--color-rose-50: #FCF8F6;
-	--color-rose-100: #F5EEEC;
-	--color-rose-300: #CAAFA7;
-	--color-rose-400: #AD8A85;
-	--color-rose-500: #87635A;
-	--color-rose-900: #260F08;
-	--color-brand-red: #C73B0F;
-	--color-brand-green: #1EA575;
-}
 
 /* Keep keyboard focus visibility explicit and consistent across interactive controls. */
 :where(

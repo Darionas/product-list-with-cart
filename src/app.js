@@ -20,7 +20,7 @@ function renderDataLoadError() {
     message.textContent = 'Please check your connection and try again.';
 
     const retryButton = document.createElement('button');
-    retryButton.className = 'mt-4 inline-flex h-11 items-center justify-center rounded-full border-2 border-brand-red bg-brand-red px-5 text-sm font-semibold text-white cursor-pointer';
+    retryButton.className = 'btn-retry';
     retryButton.textContent = 'Retry';
     retryButton.addEventListener('click', () => {
         window.location.reload();

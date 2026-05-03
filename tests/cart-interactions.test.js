@@ -130,4 +130,56 @@ describe('cart interactions', () => {
         expect(startNewOrderBtn).not.toBeNull();
         expect(document.activeElement).toBe(startNewOrderBtn);
     });
+
+    it('keeps focus trapped in modal when tabbing', async () => {
+        await bootApp();
+
+        const addButton = await waitForElement('.add-to-cart-btn');
+        expect(addButton).not.toBeNull();
+
+        addButton.click();
+
+        const incButton = document.querySelector('.inc');
+        incButton.click();
+
+        const confirmBtn = await waitForElement('.confirm-btn');
+        expect(confirmBtn).not.toBeNull();
+
+        confirmBtn.click();
+
+        const modal = await waitForElement('[role="dialog"]');
+        expect(modal).not.toBeNull();
+
+        const startNewOrderBtn = modal.querySelector('.start-new-order-btn');
+        const modalOverlay = modal.parentElement;
+
+        expect(startNewOrderBtn).not.toBeNull();
+        expect(modalOverlay).not.toBeNull();
+        expect(document.activeElement).toBe(startNewOrderBtn);
+
+        modalOverlay.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+        expect(document.activeElement).toBe(startNewOrderBtn);
+
+        modalOverlay.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }));
+        expect(document.activeElement).toBe(startNewOrderBtn);
+    });
+
+    it('does not decrement quantity below one in cart controls', async () => {
+        await bootApp();
+
+        const addButton = await waitForElement('.add-to-cart-btn');
+        expect(addButton).not.toBeNull();
+
+        addButton.click();
+
+        const incButton = document.querySelector('.inc');
+        const decButton = document.querySelector('.dec');
+
+        incButton.click();
+        decButton.click();
+
+        expect(document.querySelector('[data-cart-index="0"]')).not.toBeNull();
+        expect(document.querySelector('.orderedDishes').textContent.trim()).toBe('1');
+        expect(document.querySelector('.totalDishes').textContent.trim()).toBe('1');
+    });
 });
